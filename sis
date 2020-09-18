@@ -13,8 +13,8 @@ typedef struct{
 
 }hospede;
 
-int buscar(hospede *H,FILE *arq);
-int cadastrar(hospede *H,FILE *arq);
+void buscar(hospede *H,FILE *arq);
+void cadastrar(hospede *H,FILE *arq);
 int atualizar(hospede *H,FILE *arq);
 void remover (hospede *H,FILE *arq);
 void imprimir(hospede *H,FILE *arq);
@@ -87,7 +87,7 @@ int main(){
 
 
 
-int buscar(hospede *H,FILE *arq){
+void buscar(hospede *H,FILE *arq){
     char icpf[11];
     int c;
     arq = fopen("arquivo_hosp.dat", "rb");
@@ -104,34 +104,32 @@ int buscar(hospede *H,FILE *arq){
         if(c==0 ){
             printf("CPF : %s \n",H->cpf);
             fclose(arq);
-            return 0;}
-        fread(H, sizeof(hospede),4,arq);
+            break;}
+        fread(H, sizeof(hospede),1,arq);
     }while(!feof(arq));//Informa se chegou ao fim do arquivo
     printf("Não existe esse CPF na lista de hospedes!\n");
     fclose(arq);
-    return 0;
 }
 
-int cadastrar(hospede *H,FILE *arq){//H é o vetor de structs e o arquivo
+void cadastrar(hospede *H,FILE *arq){//H é o vetor de structs e o arquivo
 
     arq = fopen("arquivo_hosp.dat", "ab");
     if(arq==NULL){printf("Erro ao abrir arquivo.\n");
                 return 1;}
     printf("Nome: \n");
         fflush(stdin);
-        gets(H->nome);
+        scanf("%[^\n]s",H->nome);
 	printf(" \n--------\n Sobrenome: \n");
         fflush(stdin);
-        gets(H->sobrenome);
+        scanf("%[^\n]s",H->sobrenome);
 	printf(" \n--------\n cpf : \n");
         fflush(stdin);
-        gets(H->cpf);
+       scanf("%[^\n]s",H->cpf);
 	printf(" \n--------\n Telefone: \n--------\n");
         fflush(stdin);
         scanf("%d",&H->telefone);
     fwrite(H, sizeof(hospede),1,arq);//apontador, tipo, tamanha de quantos serao escritos , apontador para o FILE
     fclose(arq);
-    return H->cpf;
 }
 
 int atualizar(hospede *H,FILE *arq){ //fazer depois
