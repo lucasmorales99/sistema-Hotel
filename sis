@@ -8,13 +8,13 @@
 typedef struct{
     char nome[20];
     char sobrenome[20];
-    char cpf[11];
+    char cpf[13];
     int telefone;
 
 }hospede;
 
-void buscar(hospede *H,FILE *arq);
-void cadastrar(hospede *H,FILE *arq);
+int buscar(hospede *H,FILE *arq);
+int cadastrar(hospede *H,FILE *arq);
 int atualizar(hospede *H,FILE *arq);
 void remover (hospede *H,FILE *arq);
 void imprimir(hospede *H,FILE *arq);
@@ -40,7 +40,7 @@ int main(){
         printf(" [1]–Buscar por cadastro\n");
         printf(" [2]–Cadastro novo\n");
         printf(" [3]–Atualizar cadastro\n");
-        printf(" [4]–Remover cadastro");
+        printf(" [4]–Remover cadastro\n");
         printf(" [5]–Imprimir todos cadastrados\n");
         printf(" [6]–Gerar relatório\n");
         printf(" [9]-Finalizar\n");
@@ -87,49 +87,56 @@ int main(){
 
 
 
-void buscar(hospede *H,FILE *arq){
-    char icpf[11];
+int buscar(hospede *H,FILE *arq){
+    char icpf[13];
     int c;
     arq = fopen("arquivo_hosp.dat", "rb");
-    if(arq==NULL){printf("Erro ao abrir arquivo.\n");
-                 return 0;}
+    if(arq==NULL){
+        printf("Erro ao abrir arquivo.\n");
+                 return 0;
+                 }
     fread(H, sizeof(hospede),1,arq);
     printf("Digite o cpf que deseja procurar : \n");
     setbuf(stdin, NULL);
     scanf("%[^\n]s",icpf); //variavel que fara a comparação com cada cpf que contem no arquivo.dat
-   // fseek(arq, 0 * sizeof(hospede), SEEK_SET);
-    printf(" %s\n",H->cpf);
+    printf("entrou1\n");
     do{
         c=strcmp(H->cpf,icpf);
-        if(c==0 ){
+        printf("entrou2\n");
+        if(c==0){
             printf("CPF : %s \n",H->cpf);
             fclose(arq);
-            break;}
+            return 0;
+            }
         fread(H, sizeof(hospede),1,arq);
     }while(!feof(arq));//Informa se chegou ao fim do arquivo
+
     printf("Não existe esse CPF na lista de hospedes!\n");
     fclose(arq);
+    return 0;
 }
 
-void cadastrar(hospede *H,FILE *arq){//H é o vetor de structs e o arquivo
+int cadastrar(hospede *H,FILE *arq){//H é o vetor de structs e o arquivo
 
     arq = fopen("arquivo_hosp.dat", "ab");
     if(arq==NULL){printf("Erro ao abrir arquivo.\n");
                 return 1;}
     printf("Nome: \n");
-        fflush(stdin);
-        scanf("%[^\n]s",H->nome);
+        setbuf(stdin, NULL);
+        scanf("%[^\n]s", H->nome);
 	printf(" \n--------\n Sobrenome: \n");
-        fflush(stdin);
-        scanf("%[^\n]s",H->sobrenome);
+        setbuf(stdin, NULL);
+        scanf("%[^\n]s", H->sobrenome);
 	printf(" \n--------\n cpf : \n");
-        fflush(stdin);
-       scanf("%[^\n]s",H->cpf);
+        setbuf(stdin, NULL);
+        scanf("%[^\n]s", H->cpf);
 	printf(" \n--------\n Telefone: \n--------\n");
-        fflush(stdin);
-        scanf("%d",&H->telefone);
+        setbuf(stdin, NULL);
+        scanf("%d", &H->telefone);
+        printf("%d", H->telefone);
     fwrite(H, sizeof(hospede),1,arq);//apontador, tipo, tamanha de quantos serao escritos , apontador para o FILE
     fclose(arq);
+    //return H->cpf;
 }
 
 int atualizar(hospede *H,FILE *arq){ //fazer depois
@@ -143,24 +150,23 @@ void remover (hospede *H,FILE *arq){
 }
 
 void imprimir(hospede *H,FILE *arq){
-    char icpf[11],c;
+    char icpf[13];int c;
     arq = fopen("arquivo_hosp.dat", "rb");
-    c=fgetc(arq);
-    if(arq==NULL){printf("Erro ao abrir arquivo.\n");
+    if(arq==NULL){printf(" Erro ao abrir arquivo.\n");
                  return 0;}
-                 printf("%c",c);
     fread(H, sizeof(hospede),1,arq);
-    printf("Digite o CPF que deseja procurar : \n");
-    fflush(stdin);
-    gets(icpf);
+    printf(" Digite o CPF que deseja procurar : \n");
+    setbuf(stdin, NULL);
+    scanf("%[^\n]s",icpf);
+    printf("entra1\n");
     do{
-        if(strcmp(H->cpf,icpf) ==0){
-            printf(" Nome: %c \n Sobrenome: %c \n--------\n cpf :  %c\nTelefone: %d \n--------\n",H->nome,H->sobrenome,H->cpf,H->telefone);
-        } else if(H->nome == NULL){printf("NULL");fclose(arq);return NULL;}
+        c=strcmp(H->cpf,icpf);
+        printf("entrou2\n");
+        if(c==0){
+            printf(" Nome: %s \n Sobrenome: %s \n CPF :  %s\n  Telefone: %d \n", H->nome, H->sobrenome, H->cpf, H->telefone);}
         fread(H, sizeof(hospede),1,arq);
     }while(!feof(arq));
     fclose(arq);
-    return H->cpf;
 }
 
 int relatorio(hospede *H,FILE *arq){
@@ -169,10 +175,12 @@ int relatorio(hospede *H,FILE *arq){
     if(arq==NULL){printf("Erro ao abrir arquivo.\n");
                  return 0;}
     fread(H, sizeof(hospede),1,arq);
+    printf("entra1\n");
     do{
-            if(H->nome == NULL) i++;
-            printf(" Nome: %c \n Sobrenome : %c \n CPF : %c \n Telefone ",H->nome,H->sobrenome,H->cpf,H->telefone);
+    printf("------------\n");
+     printf(" Nome: %s \n Sobrenome: %s \n CPF :  %s\n  Telefone: %d \n", H->nome, H->sobrenome, H->cpf, H->telefone);
         fread(H, sizeof(hospede),1,arq);
     }while(!feof(arq));
     fclose(arq);
 }
+
